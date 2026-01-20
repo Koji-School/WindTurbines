@@ -45,24 +45,36 @@ public class WindTurbines
         if (windData.size() <= 1) {
             return "No data loaded";
         }
-        String maxState = "";
-        int max = 0;
+        
+        ArrayList<String> states = new ArrayList<>();
+        ArrayList<Integer> counts = new ArrayList<>();
+        
         for (String[] row : windData.subList(1, windData.size())) {
-            String state = row[0];
-            int possible = 0;
-            for (String[] row2 : windData.subList(1, windData.size())) {
-                if (state.equals(row2[0])) {
-                    String numTurbines = row2[9];
-                    numTurbines = numTurbines.replace("\"", "");
-                    int value = Integer.parseInt(numTurbines);
-                    possible += value;
-                }
-            }
-            if (max < possible) {
-                max = possible;
-                maxState = state.replace("\"", "");
+            String state = row[0].replace("\"", "");
+            if (!states.contains(state)) {
+                states.add(state);
+                counts.add(0);
             }
         }
+        
+        for (String[] row : windData.subList(1, windData.size())) {
+            String state = row[0].replace("\"", "");
+            String numTurbines = row[9].replace("\"", "");
+            int value = Integer.parseInt(numTurbines);
+            
+            int index = states.indexOf(state);
+            counts.set(index, counts.get(index) + value);
+        }
+        
+        String maxState = "";
+        int max = 0;
+        for (int i = 0; i < states.size(); i++) {
+            if (counts.get(i) > max) {
+                max = counts.get(i);
+                maxState = states.get(i);
+            }
+        }
+        
         return maxState + ": " + max;
     }
 
